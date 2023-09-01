@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:period_tracker/intro/last_period_screen.dart';
 import 'package:period_tracker/widgets/back_arrow_button.dart';
 import 'package:period_tracker/widgets/custom_app_button.dart';
 
@@ -43,7 +44,7 @@ class GoalsScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => LodingScreen()));
+                        builder: (context) => LastPeriodScreen()));
               },
             ),
             GoalWidget(
@@ -56,7 +57,7 @@ class GoalsScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => LodingScreen()));
+                        builder: (context) => LastPeriodScreen()));
               },
             ),
             GoalWidget(
@@ -68,7 +69,7 @@ class GoalsScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => LodingScreen()));
+                        builder: (context) => LastPeriodScreen()));
               },
             ),
           ],

@@ -1,4 +1,12 @@
+import 'dart:convert';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:period_tracker/themes.dart';
+import 'package:period_tracker/ui/statistics/statistics_screen.dart';
+
+import 'routes/router_helper.dart' as router;
 import 'package:flutter/material.dart';
+import 'package:period_tracker/models/user_data.dart';
+import 'package:period_tracker/providers/app_data_provider.dart';
 import 'package:period_tracker/providers/story_provider.dart';
 import 'package:period_tracker/ui/intro/intro_story.dart';
 
@@ -8,17 +16,24 @@ import 'package:period_tracker/ui/self_care/self_care_screen.dart';
 import 'package:period_tracker/utils/constants.dart';
 import 'package:period_tracker/widgets/calendar_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants.dart';
 import 'custom_calendar.dart';
 import 'dates_provider.dart';
 import 'providers/feeling_provider.dart';
 import 'ui/calendar/calendar_screen.dart';
+String? userData;
 
-void main() {
-  runApp(const MyApp());
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+   userData= prefs.getString('userData');
+  final appDataProvider = AppDataProvider();
+  await appDataProvider.loadTheme();
+  debugPrint("userData$userData");
+  runApp(MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -30,25 +45,30 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DatesProvider()),
         ChangeNotifierProvider(create: (_) => StoryProvider()),
         ChangeNotifierProvider(create: (_) => FeelingProvider()),
+        ChangeNotifierProvider(create: (_) => AppDataProvider()),
       ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-            brightness: Brightness.light,
-            colorScheme: ColorScheme.fromSeed(seedColor: accentColor),
-            useMaterial3: false,
-            primarySwatch: primarySwatch),
-        // home: const IntroStory(),
-        darkTheme: ThemeData(
-          brightness: Brightness.dark,
-          /* dark theme settings */
-        ),
-        themeMode: ThemeMode.light,
-        routes: {
-          '/': (context) => const IntroStory(),
-          home_screen: (context) => const HomeScreen(),
-          profile_screen: (context) => ProfileScreen(),
+      child: Builder(
+        builder: (context){
+          final provider=Provider.of<AppDataProvider>(context);
+          return MaterialApp(
+            title: 'Flutter Demo',
+            debugShowCheckedModeBanner: false,
+            home: userData != null ? HomeScreen() : IntroStory(),
+            theme:provider.isDarkMode?ThemeData(
+              brightness: Brightness.light
+            ):ThemeData(
+              brightness: Brightness.dark
+            ),
+            // ThemeData(
+            //     brightness: ThemeClass.light,
+            //     fontFamily: "poppins",
+            //     colorScheme: ColorScheme.fromSeed(seedColor: accentColor),
+            //     useMaterial3: false,
+            //     primarySwatch: primarySwatch),
+            // darkTheme: ThemeClass.darkTheme,
+            themeMode: ThemeMode.system,
+            onGenerateRoute: router.generateRoute,
+          );
         },
       ),
     );
@@ -115,12 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return SelfCareScreen();
       case 2:
-        return Container(
-          child: Center(
-            child: Text('Coming Soon'),
-          ),
-        );
-      // return StatisticsScreen();
+      return StatisticsScreen();
       case 3:
         return ProfileScreen();
       default:

@@ -39,6 +39,26 @@ class StoryProvider extends ChangeNotifier {
             'Maintain health records and get a health report for a doctor',
         image: 'assets/temp/intro_4.jpg'),
   ]);
+  Story healthReportStory = Story(id: '1', statuses: [
+    Status(
+        color: Colors.purple,
+        description: 'Track your cycle in a simple and convenient interface',
+        image: 'assets/temp/intro_1.jpg',
+    ),
+    Status(
+        color: Colors.purple,
+        description: 'Get health tips and advices',
+        image: 'assets/temp/intro_2.jpg'),
+    Status(
+        color: Colors.purple,
+        description: 'Set goals and we will help you achieve them!',
+        image: 'assets/temp/intro_3.jpg'),
+    Status(
+        color: Colors.purple,
+        description:
+            'Maintain health records and get a health report for a doctor',
+        image: 'assets/temp/intro_4.jpg'),
+  ]);
 
   List<Story> stories = <Story>[
     Story(id: '1', statuses: [

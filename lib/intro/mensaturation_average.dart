@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:vertical_picker/vertical_picker.dart';
 
+import '../routes/session_manager.dart';
 import '../utils/constants.dart';
 import '../widgets/back_arrow_button.dart';
 import '../widgets/build_slide_transition.dart';
@@ -11,6 +12,7 @@ import 'bithdate.dart';
 import 'components/numberPicker.dart';
 
 class MensaturationDays extends StatelessWidget {
+  int menstruationDays=1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,8 +56,11 @@ class MensaturationDays extends StatelessWidget {
             child: NumberPicker(
               min: 1,
               max: 12,
-              onSelectionChange: (int number) {},
-              startNumber: 5,
+              onSelectionChange: (int number) {
+                menstruationDays=number;
+                debugPrint("MA: SQLDatabase=>cyclingAverageNo$menstruationDays");
+              },
+              startNumber: 1,
             ),
           ),
           Spacer(),
@@ -76,6 +81,11 @@ class MensaturationDays extends StatelessWidget {
           ),
           CustomAppButton(
             onTap: () {
+              // if (menstruationDays) {
+              //   return;
+              // }
+              SessionManager sessionManager=SessionManager();
+              sessionManager.menstruationAverage(menstruationDays.toString());
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => DateOfBith()));
             },

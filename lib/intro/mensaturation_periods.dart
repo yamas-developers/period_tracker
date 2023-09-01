@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:period_tracker/models/user_data.dart';
 import 'package:period_tracker/utils/public_methods.dart';
 import 'package:period_tracker/widgets/build_slide_transition.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/app_data_provider.dart';
+import '../routes/session_manager.dart';
 import '../utils/constants.dart';
 import '../widgets/back_arrow_button.dart';
 import '../widgets/custom_app_button.dart';
+import 'circular_progress_indicator.dart';
 import 'goals_screens.dart';
 
 class MensaturationPeriods extends StatefulWidget {
@@ -14,18 +19,24 @@ class MensaturationPeriods extends StatefulWidget {
 }
 
 class _MensaturationPeriodsState extends State<MensaturationPeriods> {
-  String dropdownValue = '1 day before';
-  TimeOfDay? selectedTime;
+  String reminderDays = '1 day before';
+  TimeOfDay? reminderTime;
+  String? selectedDate;
+  String? cyclingAverageNo;
+  String? menstruationDays;
+  String? dob;
+  String? remainderDays;
+  String? remainderTime;
 
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialTime: selectedTime ?? TimeOfDay.now(),
+      initialTime: reminderTime ?? TimeOfDay.now(),
     );
 
     if (pickedTime != null) {
       setState(() {
-        selectedTime = pickedTime;
+        reminderTime = pickedTime;
       });
     }
   }
@@ -36,9 +47,10 @@ class _MensaturationPeriodsState extends State<MensaturationPeriods> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         toolbarHeight: 0,
+        elevation: 0,
       ),
       backgroundColor: Colors.white,
-      body: Container(
+      body: SizedBox(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -56,7 +68,7 @@ class _MensaturationPeriodsState extends State<MensaturationPeriods> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GoalsScreen(),
+                          builder: (context) => LodingScreen(),
                         ),
                       );
                     },
@@ -116,10 +128,10 @@ class _MensaturationPeriodsState extends State<MensaturationPeriods> {
                                 color: Colors.deepPurpleAccent, width: 2.0),
                           ),
                         ),
-                        value: dropdownValue,
+                        value: reminderDays,
                         onChanged: (String? newValue) {
                           setState(() {
-                            dropdownValue = newValue!;
+                            reminderDays = newValue!;
                           });
                         },
                         items: [
@@ -164,8 +176,8 @@ class _MensaturationPeriodsState extends State<MensaturationPeriods> {
                             _selectTime(context);
                           },
                           controller: TextEditingController(
-                            text: selectedTime != null
-                                ? '${selectedTime!.format(context)}'
+                            text: reminderTime != null
+                                ? '${reminderTime!.format(context)}'
                                 : '',
                           ),
                         ),
@@ -176,16 +188,47 @@ class _MensaturationPeriodsState extends State<MensaturationPeriods> {
               ),
             ),
             Spacer(),
-            CustomAppButton(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GoalsScreen(),
-                  ),
+            Consumer<AppDataProvider>(
+              builder: (context, appDataProvider, child) {
+                return CustomAppButton(
+                  onTap: () async {
+
+                    SessionManager sessionManager = SessionManager();
+                    sessionManager.reminderDays(reminderDays.toString(), reminderTime.toString());
+                    selectedDate = await sessionManager.getDataFromSP("date");
+                    cyclingAverageNo = await sessionManager.getDataFromSP("cyclingAverageDays");
+                    menstruationDays = await sessionManager.getDataFromSP("menstruationAverage");
+                    dob = await sessionManager.getDataFromSP("dob");
+                    remainderDays = await sessionManager.getDataFromSP("reminderDays");
+                    remainderTime = await sessionManager.getDataFromSP("reminderTime");
+                    if (selectedDate!.isNotEmpty &&
+                        cyclingAverageNo!.isNotEmpty &&
+                        menstruationDays!.isNotEmpty &&
+                        dob!.isNotEmpty &&
+                        remainderDays!.isNotEmpty &&
+                        remainderTime!.isNotEmpty) {
+                      appDataProvider.addUser(
+                        UserData(
+                            selectedDate: selectedDate!,
+                            cyclingAverageNo: cyclingAverageNo!,
+                            menstruationDays: menstruationDays!,
+                            dob: dob!,
+                            remainderDays: remainderDays!,
+                            remainderTime: remainderTime!
+                        ),
+                        context
+                      );
+                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LodingScreen(),
+                      ),
+                    );
+                  },
+                  title: 'NEXT',
                 );
               },
-              title: 'NEXT',
             ),
             SizedBox(
               height: 16,

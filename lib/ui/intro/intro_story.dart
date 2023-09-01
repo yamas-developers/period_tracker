@@ -1,10 +1,12 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:period_tracker/intro/goals_screens.dart';
 import 'package:period_tracker/intro/last_period_screen.dart';
 import 'package:period_tracker/providers/story_provider.dart';
 import 'package:period_tracker/utils/public_methods.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/status.dart';
 import '../../utils/constants.dart';
@@ -30,12 +32,12 @@ class _IntroStoryState extends State<IntroStory> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      initilizeStory(context.read<StoryProvider>().introStory);
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      initializeStory(context.read<StoryProvider>().introStory);
     });
   }
 
-  initilizeStory(Story story) {
+  initializeStory(Story story) {
     storyItems.clear();
     for (int i = 0; i < story.statuses.length; i++) {
       // list.add(story!.stories[i]);
@@ -45,7 +47,7 @@ class _IntroStoryState extends State<IntroStory> {
             // controller: storyController,
             duration: const Duration(seconds: 3),
             caption: story.statuses[i].description,
-            captionStyle: TextStyle(
+            captionStyle: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.w500,
               color: Colors.black,
@@ -113,7 +115,7 @@ class _IntroStoryState extends State<IntroStory> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => LastPeriodScreen()));
+                                        builder: (context) => GoalsScreen()));
                               }
                             },
                             child: Container(

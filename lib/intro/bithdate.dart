@@ -4,6 +4,7 @@ import 'package:lottie/lottie.dart';
 import 'package:period_tracker/widgets/build_slide_transition.dart';
 import 'package:vertical_picker/vertical_picker.dart';
 
+import '../routes/session_manager.dart';
 import '../utils/constants.dart';
 import '../widgets/back_arrow_button.dart';
 import '../widgets/custom_app_button.dart';
@@ -11,6 +12,7 @@ import 'mensaturation_periods.dart';
 import 'components/numberPicker.dart';
 
 class DateOfBith extends StatelessWidget {
+  int? dob;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,13 +54,16 @@ class DateOfBith extends StatelessWidget {
             child: DobPicker(
                 startNumber: 6,
                 onSelectionChange: (int number) {
-                  print('MK: birth year: $number');
+                  dob=number;
+                  print('MK: birth year: $dob');
                 }),
           ),
           Spacer(),
 
           CustomAppButton(
             onTap: () {
+              SessionManager sessionManager=SessionManager();
+              sessionManager.dateOfBirth(dob.toString());
               Navigator.push(
                   context,
                   MaterialPageRoute(

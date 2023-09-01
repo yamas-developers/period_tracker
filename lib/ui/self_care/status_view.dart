@@ -31,11 +31,11 @@ class _StatusViewState extends State<StatusView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      initilizeStory();
+      initializeStory();
     });
   }
 
-  initilizeStory() {
+  initializeStory() {
     storyItems.clear();
     for (int i = 0; i < widget.story.statuses.length; i++) {
       // list.add(story!.stories[i]);
@@ -44,6 +44,7 @@ class _StatusViewState extends State<StatusView> {
           AssetImage(widget.story.statuses[i].image ?? ''),
           // controller: storyController,
           duration: const Duration(seconds: 3),
+          shown: true,
           caption: widget.story.statuses[i].description,
           // url: widget.statuses[i].image!
         ));
@@ -79,13 +80,14 @@ class _StatusViewState extends State<StatusView> {
                   storyPro.stories[index] = widget.story;
                   if (storyPro.stories.length > (index + 1)) {
                     widget.story = storyPro.stories[index + 1];
-                    initilizeStory();
+                    initializeStory();
                   } else {
                     Navigator.pop(context);
                   }
                 },
                 progressPosition: ProgressPosition.top,
                 repeat: true,
+                // showTopCancelButton: true,
                 controller: storyController,
               ),
       );

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:period_tracker/models/user_data.dart';
+import 'package:period_tracker/routes/session_manager.dart';
 import 'package:period_tracker/utils/public_methods.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/constants.dart';
 import '../widgets/back_arrow_button.dart';
@@ -87,6 +90,7 @@ class _LastPeriodScreenState extends State<LastPeriodScreen> {
                     if (pickedDate != null) {
                       setState(() {
                         selectedDate = pickedDate;
+                        debugPrint("MA: SQLDatabase=>Last Period Screen$selectedDate");
                       });
                     }
                   },
@@ -99,11 +103,13 @@ class _LastPeriodScreenState extends State<LastPeriodScreen> {
               SizedBox(height: 16.0),
               Spacer(),
               CustomAppButton(
-                  onTap: () {
+                  onTap: () async{
                     // print('MK: selected Date: = ${selectedDate}');
                     if (selectedDate == null) {
                       return;
                     }
+                    SessionManager sessionManager=SessionManager();
+                    sessionManager.lastPeriodDate(selectedDate.toString());
                     Navigator.push(
                         context,
                         MaterialPageRoute(

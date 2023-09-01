@@ -5,12 +5,14 @@ import 'package:period_tracker/utils/constants.dart';
 import 'package:period_tracker/widgets/custom_app_button.dart';
 import 'package:vertical_picker/vertical_picker.dart';
 
+import '../routes/session_manager.dart';
 import '../widgets/back_arrow_button.dart';
 import '../widgets/build_slide_transition.dart';
 import 'components/numberPicker.dart';
 import 'mensaturation_average.dart';
 
 class CyclingAverageDay extends StatelessWidget {
+  int cyclingAverageDay=1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,8 +61,11 @@ class CyclingAverageDay extends StatelessWidget {
             child: NumberPicker(
                 min: 21,
                 max: 56,
-                onSelectionChange: (int number) {},
-                startNumber: 8),
+                onSelectionChange: (int number) {
+                  cyclingAverageDay=number;
+                  debugPrint("MA: SQLDatabase=>cyclingAverageNo$cyclingAverageDay");
+                },
+                startNumber: 1),
           ),
           Spacer(),
           Row(
@@ -82,6 +87,8 @@ class CyclingAverageDay extends StatelessWidget {
           ),
           CustomAppButton(
             onTap: () {
+              SessionManager sessionManager=SessionManager();
+              sessionManager.cyclingAverageDays(cyclingAverageDay.toString());
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => MensaturationDays()));
             },

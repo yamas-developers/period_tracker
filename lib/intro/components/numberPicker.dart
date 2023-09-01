@@ -76,7 +76,6 @@ class DobPicker extends StatefulWidget {
 
 class _DobPickerState extends State<DobPicker> {
   int selectedNumber = 1;
-
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {

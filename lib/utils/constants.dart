@@ -12,6 +12,7 @@ const Color ovulationDayColor = Color(0xff48caf3);
 const Color greyDisabledColor = Color(0xffd0d0d0);
 const Color greyFontColor = Color(0xff757373);
 const Color greyBgColor = Color(0xfff4f4f4);
+const Color bgColor = Color(0xffffffff);
 
 MaterialColor primarySwatch = MaterialColor(
   accentColor.value,
