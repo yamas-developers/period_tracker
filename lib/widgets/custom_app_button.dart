@@ -10,10 +10,11 @@ class CustomAppButton extends StatelessWidget {
     this.image="",
     required this.title,
     this.fontSize=14,
-    this.color=bgColor
+    this.color=bgColor, this.type
   });
 
   final dynamic onTap;
+  final String? type;
   final double height;
   final String image;
   final String title;
@@ -22,41 +23,40 @@ class CustomAppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
-      height: height,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: accentColor,
-          shape: RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(3.0), // Set the desired border radius
+      return Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: height,
+        child: ElevatedButton(
+          onPressed: type=="profile"?null:onTap,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: accentColor,
+            shape: RoundedRectangleBorder(
+              borderRadius:
+              BorderRadius.circular(3.0), // Set the desired border radius
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                    color: color,
-                  fontSize: fontSize
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                      color: color,
+                      fontSize: fontSize
+                  ),
                 ),
-              ),
-              SizedBox(width: 5,),
-              image.isEmpty?SizedBox():
-              Image.asset(
-                image,height: 20,width: 20,
-                fit: BoxFit.contain,
-                color: bgColor,
-              )
-            ],
+                SizedBox(width: 5,),
+                image.isEmpty?SizedBox():
+                Image.asset(
+                  image,height: 20,width: 20,
+                  fit: BoxFit.contain,
+                  color: bgColor,
+                )
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );}
 }

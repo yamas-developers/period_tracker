@@ -17,6 +17,7 @@ class BirthInputScreen extends StatefulWidget {
 
 class _BirthInputScreenState extends State<BirthInputScreen> {
   final birth = 0;
+  int selectedYearIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,9 +34,27 @@ class _BirthInputScreenState extends State<BirthInputScreen> {
           },
           icon: Icon(Icons.close),
         ),
+        actions: [
+          GestureDetector(
+            onTap: () {
+                Navigator.pop(context);
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20, right: 15),
+              child: Text(
+                "Save",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
+          const SizedBox(height: 30,),
           ListTile(
             title: Text('Year of Birth', style: TextStyle(
               fontSize: 18,fontWeight: FontWeight.w600
@@ -63,7 +82,11 @@ class _BirthInputScreenState extends State<BirthInputScreen> {
                 //height of each item
                 looping: true,
                 onSelectedItemChanged: (int index) {
-                  // selectitem = index;
+                  setState(() {
+                    selectedYearIndex = index;
+                  });
+                  final selectedYear = 1953 + selectedYearIndex; // Calculate the selected year
+                  print("Selected Year: $selectedYear");
                 },
               ),
             ),

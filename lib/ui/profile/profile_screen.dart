@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:period_tracker/providers/app_data_provider.dart';
@@ -9,7 +8,6 @@ import 'package:period_tracker/ui/profile/birth.dart';
 import 'package:period_tracker/utils/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'cycle.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -40,10 +38,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     });
   }
-
   Future<int> getCurrentTheme()async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool? isDarkMode=await prefs.getBool("isLightMode");
+    isDarkMode= prefs.getBool("isLightMode")??false;
+    // isDarkMode=!isDarkMode;
     print("MA: profileScreen=>isDarkModel$isDarkMode");
     currentTheme=isDarkMode==true?1:0;
     print("MA: profileScreen=>currentTheme$currentTheme");
@@ -86,14 +84,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             return GestureDetector(
                               onTap: () {
                                 //lightMode
-                                if (index == 0 && !appDataProvider.isDarkMode) {
+                                if (index == 0 && appDataProvider.isDarkMode) {
                                   setState(() {
                                     currentTheme = index;
                                     print("lightMode${!appDataProvider.isDarkMode}");
                                     appDataProvider.toggleTheme();
                                   });
                                   //darkMode
-                                } else if (index == 1 && appDataProvider.isDarkMode) {
+                                } else if (index == 1 && !appDataProvider.isDarkMode) {
                                   setState(() {
                                     currentTheme = index;
                                     print("darkMode${appDataProvider.isDarkMode}");
@@ -116,16 +114,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     SizedBox(height: 8),
-                    ListTile(
-                        leading: Icon(
-                          Icons.adjust_rounded,
-                          color: accentColor,
-                        ),
-                        title: Text('Goal'),
-                        subtitle: Text(
-                          'Keep track of your cycle',
-                          // style: TextStyle(color: fontColor)
-                        )),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.pushNamed(context, "goalsScreen", arguments: {
+                          "type":"profile",
+                        });
+                      },
+                      child: ListTile(
+                          leading: Icon(
+                            Icons.adjust_rounded,
+                            color: accentColor,
+                          ),
+                          title: Text('Goal'),
+                          subtitle: Text(
+                            'Keep track of your cycle',
+                            // style: TextStyle(color: fontColor)
+                          )),
+                    ),
                     SizedBox(height: 8),
                     ListTile(
                       leading: Icon(
@@ -172,12 +177,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     SizedBox(height: 8),
-                    ListTile(
-                      leading: Icon(
-                        Icons.face,
-                        color: accentColor,
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.pushNamed(context, "useAccessCodeScreen");
+                      },
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.face,
+                          color: accentColor,
+                        ),
+                        title: Text('Use access code'),
                       ),
-                      title: Text('Use access code'),
                     ),
                     SizedBox(height: 8),
                     ListTile(
