@@ -12,7 +12,6 @@ class SessionManager {
     if(key.isNotEmpty){
       return prefs.getString(key);
     }
-
     return null;
   }
 
