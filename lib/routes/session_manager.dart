@@ -3,10 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/profile/cycles.dart';
 import '../models/user_data.dart';
 
 class SessionManager {
-
   Future<String?> getDataFromSP(String key)async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if(key.isNotEmpty){
@@ -41,11 +41,17 @@ class SessionManager {
     prefs.setString('reminderDays', days);
     prefs.setString('reminderTime', time);
   }
-  void storeAppData(UserData userData) async {
+  void storeIntroScreenData(UserData userData) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userDataJson = jsonEncode(userData.toJson());
     debugPrint("MA: sessionManager=>Last Period Screen${userData.selectedDate}/${userData.remainderTime}");
-    prefs.setString('userData', userDataJson);
+    prefs.setString('introScreensData', userDataJson);
+  }
+  void storeProfileCycles(Cycles cycles) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userDataJson = jsonEncode(cycles.toJson());
+    debugPrint("MA: sessionManager=>CyclesData${cycles.cycles}/${cycles.periods}/${cycles.hasData}");
+    prefs.setString('profileCyclesData', userDataJson);
   }
 
   void storeDarkModel(String theme)async{
@@ -70,4 +76,5 @@ class SessionManager {
   //     'reminder': userData.reminder,
   //   });
   // }
+
 }

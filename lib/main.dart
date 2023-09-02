@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:period_tracker/providers/user_data_provider.dart';
 import 'package:period_tracker/themes.dart';
 import 'package:period_tracker/ui/statistics/statistics_screen.dart';
 
@@ -28,7 +29,7 @@ String? userData;
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
-   userData= prefs.getString('userData');
+   userData= prefs.getString('introScreensData');
   final appDataProvider = AppDataProvider();
   await appDataProvider.loadTheme();
   debugPrint("userData$userData");
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => StoryProvider()),
         ChangeNotifierProvider(create: (_) => FeelingProvider()),
         ChangeNotifierProvider(create: (_) => AppDataProvider()),
+        ChangeNotifierProvider(create: (_) => UserDataProvider()),
       ],
       child: Builder(
         builder: (context){
@@ -55,9 +57,9 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             home: userData != null ? HomeScreen() : IntroStory(),
             theme:provider.isDarkMode?ThemeData(
-              brightness: Brightness.light
-            ):ThemeData(
               brightness: Brightness.dark
+            ):ThemeData(
+              brightness: Brightness.light
             ),
             // ThemeData(
             //     brightness: ThemeClass.light,

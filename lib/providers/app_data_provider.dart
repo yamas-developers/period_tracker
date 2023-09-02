@@ -42,7 +42,7 @@ class AppDataProvider with ChangeNotifier {
     _userDataList.add(userData);
     debugPrint("MA: sessionManager=>userData$userData");
     SessionManager sessionManager = SessionManager();
-    sessionManager.storeAppData(userData);
+    sessionManager.storeIntroScreenData(userData);
     notifyListeners();
   }
 
@@ -113,26 +113,35 @@ class AppDataProvider with ChangeNotifier {
     }
   }
 
-  bool _isDerkMode = false;
+  bool _isDarkMode = false;
+  bool _check=false;
 
-  bool get isDarkMode => _isDerkMode;
+
+  bool get check => _check;
+
+  set check(bool value) {
+    _check = value;
+    notifyListeners();
+  }
+
+  bool get isDarkMode => _isDarkMode;
 
   void toggleTheme() {
-    _isDerkMode = !_isDerkMode;
+    _isDarkMode = !_isDarkMode;
     notifyListeners();
     saveThemePreference();
   }
-
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    _isDerkMode = prefs.getBool('isLightMode') ?? false;
-    print("load$_isDerkMode");
+    check= prefs.getBool('isLightMode') ?? false;
+    _isDarkMode =!check;
+        print("load$_isDarkMode");
     notifyListeners();
   }
 
   Future<void> saveThemePreference() async {
     final prefs = await SharedPreferences.getInstance();
-    print("save$_isDerkMode");
-    await prefs.setBool('isLightMode', _isDerkMode);
+    print("save$_isDarkMode");
+    await prefs.setBool('isLightMode', _isDarkMode);
   }
 }

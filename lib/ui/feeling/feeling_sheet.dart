@@ -101,7 +101,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
     return Consumer2<DatesProvider, FeelingProvider>(
         builder: (context, datesPro, feelingPro, _) {
       return AnimatedContainer(
-          color: Colors.white,
+          // color: Colors.white,
           constraints: BoxConstraints(
             maxHeight: _size.height,
             minHeight: 0,
@@ -148,7 +148,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
                             _hideKeyboard();
                             Navigator.pop(context);
                           },
-                          icon: Icon(Icons.close))
+                          icon: Icon(Icons.close, color: fontColor,))
                     else
                       CustomAnimatedIcon(
                         firstIcon: Icons.arrow_upward,
@@ -156,7 +156,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
                         firstCallback: dragUpStage,
                         secondCallback: dragDownStage,
                         color: currentStage == BottomSheetStages.three
-                            ? Colors.white
+                            ? fontColor
                             : null,
                         currentIcon: currentStage == BottomSheetStages.two ? 0 : 1,
                       ),
@@ -171,7 +171,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
                               fontWeight: FontWeight.w600,
                               color: currentStage == BottomSheetStages.three
                                   ? Colors.white
-                                  : null),
+                                  : null
+                          ),
                         ),
                         Text(
                           'Medium Chance of getting pregnant',
@@ -560,7 +561,9 @@ class _NotesWidgetState extends State<NotesWidget> {
               sbw(16),
               Text(
                 'Notes',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(
+                    // color: fontColor,
+                    fontSize: 16),
               )
             ]),
           ),

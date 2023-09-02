@@ -7,7 +7,23 @@ import 'package:period_tracker/widgets/custom_app_button.dart';
 import '../utils/constants.dart';
 import 'circular_progress_indicator.dart';
 
-class GoalsScreen extends StatelessWidget {
+class GoalsScreen extends StatefulWidget {
+  @override
+  State<GoalsScreen> createState() => _GoalsScreenState();
+}
+
+class _GoalsScreenState extends State<GoalsScreen> {
+  String? type;
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    final Map<String, dynamic>? data =
+    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (data != null) {
+      type=data["type"];
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +56,7 @@ class GoalsScreen extends StatelessWidget {
                   'and moods',
               animPath: 'assets/animations/track.json',
               iconOnLeft: false,
+              type: type??"",
               onChoose: () {
                 Navigator.push(
                     context,
@@ -53,6 +70,7 @@ class GoalsScreen extends StatelessWidget {
                   'throughout your cycle',
               animPath: 'assets/animations/doctor.json',
               iconOnLeft: true,
+              type: "",
               onChoose: () {
                 Navigator.push(
                     context,
@@ -64,6 +82,7 @@ class GoalsScreen extends StatelessWidget {
               title: 'Get pregnant',
               subTitle: 'Track favorable days for conception',
               animPath: 'assets/animations/pregannt.json',
+              type: "",
               iconOnLeft: false,
               onChoose: () {
                 Navigator.push(
@@ -86,12 +105,13 @@ class GoalWidget extends StatelessWidget {
     required this.subTitle,
     required this.animPath,
     this.onChoose,
-    this.iconOnLeft = true,
+    this.iconOnLeft = true, this.type,
   });
 
   final String title;
   final String subTitle;
   final String animPath;
+  final String? type;
   final dynamic onChoose;
   final bool iconOnLeft;
 
@@ -154,7 +174,7 @@ class GoalWidget extends StatelessWidget {
                 ),
                 SizedBox(
                   width: 110,
-                  child: CustomAppButton(onTap: onChoose, title: 'CHOOSE'),
+                  child: CustomAppButton(onTap: onChoose, title: 'CHOOSE', type: type,),
                 ),
               ],
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:period_tracker/dates_provider.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,15 @@ double getWidth(BuildContext context) {
 double getHeight(BuildContext context) {
   return MediaQuery.of(context).size.height;
 }
-
+void toastMessage(String message) {
+  Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      backgroundColor: fontLightColor,
+      textColor: bgColor,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1);
+}
 showModalSheet({required BuildContext context, required DateTime day}) {
   showModalBottomSheet(
     enableDrag: true,
