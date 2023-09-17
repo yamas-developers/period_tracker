@@ -29,7 +29,7 @@ class _ShowModalBottomSheetState extends State<ShowModalBottomSheet> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: accentColor,
+        // backgroundColor: accentColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(
@@ -110,7 +110,7 @@ class _ShowModalBottomSheetState extends State<ShowModalBottomSheet> {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: fontLightColor.withOpacity(0.06),
+                              // color: fontLightColor.withOpacity(0.06),
                               border: selectedIndex==index?Border.all(
                                 color: accentColor,
                                 width: 2,
@@ -141,6 +141,7 @@ class _ShowModalBottomSheetState extends State<ShowModalBottomSheet> {
                 height: 40,
                 fontSize: 15,
                 image: "",
+                color: bgColor,
                 title: "RATE",
               ),
             ),
@@ -151,7 +152,7 @@ class _ShowModalBottomSheetState extends State<ShowModalBottomSheet> {
               height: 40,
               fontSize: 15,
               image: "",
-              color: bgColor.withOpacity(0.5),
+              // color: bgColor.withOpacity(0.5),
               title: "RATE",
             ),
           ),

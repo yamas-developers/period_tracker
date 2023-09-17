@@ -35,9 +35,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
         child: Column(
           children: [
             SizedBox(
-              height: 20,
+              height: 30,
             ),
-            BackArrowButton(),
+            // BackArrowButton(),
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Text(
@@ -45,7 +45,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,
-                  color: Colors.black,
+                  // color: Colors.black,
                   fontWeight: FontWeight.w600,
                 ),
               ),

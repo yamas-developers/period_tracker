@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
+import 'package:period_tracker/providers/story_provider.dart';
+
+import '../models/calendarData/calendar_data.dart';
 
 class FeelingProvider extends ChangeNotifier {
   List _notes = [];
@@ -70,16 +73,49 @@ class FeelingProvider extends ChangeNotifier {
   List contraceptives = ['Pill taken', 'Yesterday\'s pill'];
 
   /////////variables
-  List _selectedSymptoms = [];
-  List _selectedMood = [];
-  List _selectedSex = [];
-  List _selectedDischarge = [];
-  List _selectedContraceptives = [];
-  List _selectedNotes = [];
+  List<dynamic> _selectedSymptoms = [];
+  List<dynamic> _selectedMood = [];
+  List<dynamic> _selectedSex = [];
+  List<dynamic> _selectedDischarge = [];
+  List<dynamic> _selectedContraceptives = [];
+  List<dynamic> _selectedNotes = [];
+  List<dynamic> _selectedDates=[];
+
 
   /// these notes will be specific to any day
 
   String _selectedMensus = '';
+  List<dynamic> _selectMensus=[];
+  CalendarData? _calendarData;
+
+  CalendarData? get calendarData => _calendarData;
+
+  set calendarData(CalendarData? value) {
+    _calendarData = value;
+    notifyListeners();
+  }
+
+  List<dynamic> get selectMensus => _selectMensus;
+
+  List<dynamic> get selectedDates => _selectedDates;
+
+  set selectedDates(List<dynamic> value) {
+    _selectedDates = value;
+    print("selectedDatesFP$value");
+    notifyListeners();
+  }
+
+  void addSelectedDate(String date){
+    selectedDates.add(date);
+    print("selectedDate$date");
+    notifyListeners();
+  }
+
+  set selectMensus(List<dynamic> value) {
+    _selectMensus = value;
+    print("selectMensus$value");
+    notifyListeners();
+  }
 
   clearLists() {
     _selectedSymptoms.clear();
@@ -139,6 +175,7 @@ class FeelingProvider extends ChangeNotifier {
     });
   }
 
+
   //////geters and setters
   List get selectedMood => _selectedMood;
 
@@ -146,6 +183,7 @@ class FeelingProvider extends ChangeNotifier {
 
   set selectedMood(List value) {
     _selectedMood = value;
+    notifyListeners();
   }
 
   set selectedSymptoms(List value) {
@@ -157,30 +195,37 @@ class FeelingProvider extends ChangeNotifier {
 
   set selectedSex(List value) {
     _selectedSex = value;
+    notifyListeners();
   }
 
   String get selectedMensus => _selectedMensus;
 
   set selectedMensus(String value) {
     _selectedMensus = value;
+    print("selectedMensusFP$value");
+    selectMensus.add(value);
+    notifyListeners();
   }
 
   List get notes => _notes;
 
   set notes(List value) {
     _notes = value;
+    notifyListeners();
   }
 
   List get selectedContraceptives => _selectedContraceptives;
 
   set selectedContraceptives(List value) {
     _selectedContraceptives = value;
+    notifyListeners();
   }
 
   List get selectedDischarge => _selectedDischarge;
 
   set selectedDischarge(List value) {
     _selectedDischarge = value;
+    notifyListeners();
   }
 
   List get selectedNotes => _selectedNotes;

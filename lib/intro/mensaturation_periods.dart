@@ -40,7 +40,17 @@ class _MensaturationPeriodsState extends State<MensaturationPeriods> {
       });
     }
   }
-
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp)async{
+      setState(() {
+        reminderTime=TimeOfDay.now();
+      });
+      print("reminderTime$reminderTime");
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -178,7 +188,7 @@ class _MensaturationPeriodsState extends State<MensaturationPeriods> {
                           controller: TextEditingController(
                             text: reminderTime != null
                                 ? '${reminderTime!.format(context)}'
-                                : '',
+                                : remainderTime,
                           ),
                         ),
                       ),

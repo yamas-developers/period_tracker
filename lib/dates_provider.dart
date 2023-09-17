@@ -5,6 +5,15 @@ import 'package:period_tracker/constants.dart';
 
 class DatesProvider extends ChangeNotifier {
   bool _editMode = false;
+  String? _calendarData;
+
+  String? get calendarData => _calendarData;
+
+  set calendarData(String? value) {
+    _calendarData = value;
+    print("MA: DP=>$value");
+    notifyListeners();
+  }
 
   Map<DateTime, String> _feelingData = {};
 

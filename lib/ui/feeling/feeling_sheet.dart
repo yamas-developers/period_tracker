@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:period_tracker/providers/feeling_provider.dart';
+import 'package:period_tracker/routes/session_manager.dart';
 import 'package:provider/provider.dart';
 
 import '../../dates_provider.dart';
+import '../../models/calendarData/calendar_data.dart';
 import '../../utils/constants.dart';
 import '../../utils/public_methods.dart';
 import '../../widgets/misc_widgets.dart';
@@ -37,16 +40,59 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
   bool _isKeyboardVisible = false;
 
   bool editMode = false;
+  SessionManager _sessionManager=SessionManager();
 
   @override
   initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      DatesProvider datePro =
-          Provider.of<DatesProvider>(context, listen: false);
-      FeelingProvider feelingPro =
-          Provider.of<FeelingProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      DatesProvider datePro = Provider.of<DatesProvider>(context, listen: false);
+      FeelingProvider feelingPro = Provider.of<FeelingProvider>(context, listen: false);
       datePro.selectedDay = widget.day;
       feelingPro.storeData(datePro.feelingData[widget.day]);
+      feelingPro.addSelectedDate(datePro.selectedDay.toString());
+      print("selectedDay${datePro.calendarData}");
+      String? bottomSheetData=datePro.calendarData;
+      print("bottomData${bottomSheetData}");
+      if (bottomSheetData!=null) {
+        print("decodedBottomSheetData${jsonDecode(bottomSheetData)}");
+        Map<String, dynamic> dataMap = jsonDecode(bottomSheetData);
+        print("selectedDay/${datePro.selectedDay}");
+        String formattedSelectedDay = datePro.selectedDay.toString();
+        feelingPro.selectedDates.forEach((selectedDate) {
+          String formattedSelectedDate = selectedDate.toString();
+          if (dataMap.containsKey(formattedSelectedDate)) {
+            // Map<String, dynamic> data = dataMap[selectedDate];
+            print("selectedDateinloop/${selectedDate}");
+            Map<String, dynamic> data = jsonDecode(dataMap[formattedSelectedDay]);
+            print("date$data/${datePro.selectedDay}");
+            print("symptoms${data['mood']}");
+            print("sex${data['sex']}");
+            print("discharge${data['discharge']}");
+            print("contraceptives${data['contraceptives']}");
+            // feelingPro.selectedSymptoms.clear();
+            // feelingPro.selectedMood.clear();
+            // feelingPro.selectedSex.clear();
+            // feelingPro.selectedDischarge.clear();
+            // feelingPro.selectedContraceptives.clear();
+            // feelingPro.selectedNotes.clear();
+            // CalendarData.fromJson(data);
+            feelingPro.selectedSymptoms.addAll(data['symptoms']);
+            feelingPro.selectedMood.addAll(data['mood']);
+            feelingPro.selectedSex.addAll(data['sex']);
+            feelingPro.selectedDischarge.addAll(data['discharge']);
+            feelingPro.selectedContraceptives.addAll(data['contraceptives']);
+            feelingPro.selectedNotes.addAll(data['notes']);
+            // dataMap.remove(selectedDate);
+            editMode=false;
+          }else{
+            setState(() {});
+            print("outsideiftrue");
+            editMode=true;
+          }
+        });
+      }else{
+        // print("elsebottomSheetData${jsonDecode(bottomSheetData??"")}");
+      }
       if (datePro.feelingData[widget.day] == null) {
         setState(() {
           editMode = true;
@@ -96,7 +142,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
     final mediaQuery = MediaQuery.of(context);
     final bottomInset = mediaQuery.viewInsets.bottom;
     _isKeyboardVisible = bottomInset > 0;
-
+    SessionManager _sessionManager=SessionManager();
     log('MK: vertical drag update 0 ${bottomInset}');
     return Consumer2<DatesProvider, FeelingProvider>(
         builder: (context, datesPro, feelingPro, _) {
@@ -136,55 +182,70 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
             },
             child: Column(
               children: <Widget>[
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  color: currentStage == BottomSheetStages.three
-                      ? accentColor
-                      : Colors.white,
-                  child: Row(children: <Widget>[
-                    if (currentStage == BottomSheetStages.one)
-                      IconButton(
-                          onPressed: () {
-                            _hideKeyboard();
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(Icons.close, color: fontColor,))
-                    else
-                      CustomAnimatedIcon(
-                        firstIcon: Icons.arrow_upward,
-                        secondIcon: Icons.arrow_downward,
-                        firstCallback: dragUpStage,
-                        secondCallback: dragDownStage,
-                        color: currentStage == BottomSheetStages.three
-                            ? fontColor
-                            : null,
-                        currentIcon: currentStage == BottomSheetStages.two ? 0 : 1,
-                      ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${DateFormat("MMMM dd, ").format(datesPro.selectedDay)}'
-                          '${DateFormat("E").format(datesPro.selectedDay).toUpperCase()}',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: currentStage == BottomSheetStages.three
-                                  ? Colors.white
-                                  : null
+                Consumer<FeelingProvider>(
+                  builder: (context, feelPro, _){
+                    return Container(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      // color: currentStage == BottomSheetStages.three
+                      //     ? accentColor
+                      //     : fontLightColor,
+                      child: Row(children: <Widget>[
+                        if (currentStage == BottomSheetStages.one)
+                          IconButton(
+                              onPressed: () {
+                                _hideKeyboard();
+                                setDataIntoSP(datesPro, feelingPro);
+                                // _sessionManager.saveCalendarData(
+                                //   feelPro.selectedDates,
+                                //   feelPro.selectedContraceptives,
+                                //   feelPro.selectedMood,
+                                //   feelPro.selectedSex,
+                                //   feelPro.selectMensus,
+                                //   feelPro.vaginalDischarge,
+                                //   feelPro.contraceptives
+                                // );
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(Icons.close, ))
+                        else
+                          CustomAnimatedIcon(
+                            firstIcon: Icons.arrow_upward,
+                            secondIcon: Icons.arrow_downward,
+                            firstCallback: dragUpStage,
+                            secondCallback: dragDownStage,
+                            // color: currentStage == BottomSheetStages.three
+                            //     ? fontColor
+                            //     : null,
+                            currentIcon: currentStage == BottomSheetStages.two ? 0 : 1,
                           ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${DateFormat("MMMM dd, ").format(datesPro.selectedDay)}'
+                                  '${DateFormat("E").format(datesPro.selectedDay).toUpperCase()}',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  // color: currentStage == BottomSheetStages.three
+                                  //     ? Colors.white
+                                  //     : null
+                              ),
+                            ),
+                            Text(
+                              'Medium Chance of getting pregnant',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  // color: currentStage == BottomSheetStages.three
+                                  //     ? Colors.white54
+                                  //     : greyFontColor
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'Medium Chance of getting pregnant',
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: currentStage == BottomSheetStages.three
-                                  ? Colors.white54
-                                  : greyFontColor),
-                        ),
-                      ],
-                    ),
-                  ]),
+                      ]),
+                    );
+                  },
                 ),
                 if (currentStage != BottomSheetStages.three)
                   Divider(
@@ -205,7 +266,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
                             Text(
                               "14th day of cycle",
                               style:
-                                  TextStyle(color: greyFontColor, fontSize: 16),
+                                  TextStyle(
+                                      // color: greyFontColor,
+                                      fontSize: 16),
                             ),
                           ],
                         ),
@@ -221,7 +284,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
                                   child: Wrap(children: [
                                     LastAddedDataItem(
                                         icon: 'assets/icons/symptoms.png',
-                                        list: feelingPro.selectedSymptoms),
+                                        list: feelingPro.selectedSymptoms
+                                    ),
                                     LastAddedDataItem(
                                         icon: 'assets/icons/mood.png',
                                         list: feelingPro.selectedMood),
@@ -310,6 +374,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
                               if (val == feelingPro.selectedMensus) {
                                 feelingPro.selectedMensus = '';
                               } else {
+                                print("selectedfeeMensus$val");
                                 feelingPro.selectedMensus = val;
                               }
                               setData(datesPro, feelingPro);
@@ -368,6 +433,26 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget>
   void _hideKeyboard() {
     // Unfocus the current FocusNode, which hides the keyboard
     FocusScope.of(context).unfocus();
+  }
+
+  setDataIntoSP(DatesProvider datesPro, FeelingProvider feelingPro){
+    setState(() {});
+    String jsonString=feelingPro.getDecodedData();
+    print("calendardata$jsonString/date${datesPro.selectedDay}");
+    if (jsonString.isNotEmpty) {
+      if(datesPro.feelingData.keys.contains(datesPro.selectedDay)){
+        datesPro.feelingData[datesPro.selectedDay] = jsonString;
+      }else{
+        datesPro.feelingData[datesPro.selectedDay] = jsonString;
+      }
+    //   if (datesPro.feelingData.keys.contains(datesPro.selectedDay)) {
+    //
+    //   }
+    // } else {
+
+      // datesPro.feelingData[datesPro.selectedDay] = jsonString;
+      _sessionManager.storeSPData("CalendarData", datesPro.feelingData);
+    }
   }
 
   setData(DatesProvider datesPro, FeelingProvider feelingPro) {
@@ -437,11 +522,13 @@ class LastAddedData extends StatelessWidget {
         children: [
           Image.asset(icon, height: 23, width: 23),
           sbw(10),
-          Text(
-            title,
-            style: TextStyle(
-              color: fontColor,
-              fontSize: 15,
+          Flexible(
+            child: Text(
+              title,
+              style: TextStyle(
+                color: fontColor,
+                fontSize: 15,
+              ),
             ),
           ),
         ],

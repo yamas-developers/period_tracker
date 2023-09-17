@@ -51,11 +51,11 @@ class _CycleInputScreenState extends State<CycleInputScreen> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    // periods="7";
-    // cycles="28";
-    // setState(() {
-    //
-    // });
+    periods="7";
+    cycles="28";
+    setState(() {
+
+    });
     // final Map<String, dynamic>? data =
     // ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     // if (data != null) {

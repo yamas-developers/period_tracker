@@ -27,32 +27,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
     },
   ];
   String? theme;
-  bool isDarkMode=false;
+  bool isDarkMode = false;
   @override
-  void initState(){
-    // TODO: implement initState
+  void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
-      await getCurrentTheme();
-      setState(() {
-      });
-    });
+    getCurrentTheme();
   }
-  Future<int> getCurrentTheme()async{
+
+  Future<void> getCurrentTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    isDarkMode= prefs.getBool("isLightMode")??false;
-    // isDarkMode=!isDarkMode;
-    print("MA: profileScreen=>isDarkModel$isDarkMode");
-    currentTheme=isDarkMode==true?1:0;
-    print("MA: profileScreen=>currentTheme$currentTheme");
-    return currentTheme;
+    isDarkMode = prefs.getBool("isDarkMode") ?? false;
+    setState(() {
+      currentTheme=isDarkMode==false?0:1;
+    });
+    print("ProfileScreen: isDarkMode: $isDarkMode");
   }
+
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 0),
+      appBar: AppBar(
+          toolbarHeight: 0,
+      ),
       body: Consumer<AppDataProvider>(
         builder: (context, appDataProvider, child) {
           return Padding(
@@ -83,20 +81,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ...List.generate(themeColors.length, (index) {
                             return GestureDetector(
                               onTap: () {
-                                //lightMode
                                 if (index == 0 && appDataProvider.isDarkMode) {
-                                  setState(() {
-                                    currentTheme = index;
-                                    print("lightMode${!appDataProvider.isDarkMode}");
-                                    appDataProvider.toggleTheme();
-                                  });
+                                  currentTheme = index;
+                                  print("lightMode${!appDataProvider.isDarkMode}");
+                                  appDataProvider.toggleTheme();
+                                  setState(() {});
                                   //darkMode
                                 } else if (index == 1 && !appDataProvider.isDarkMode) {
-                                  setState(() {
-                                    currentTheme = index;
-                                    print("darkMode${appDataProvider.isDarkMode}");
-                                    appDataProvider.toggleTheme();
-                                  });
+                                  currentTheme = index;
+                                  print("darkMode${appDataProvider.isDarkMode}");
+                                  appDataProvider.toggleTheme();
+                                  setState(() {});
                                 }
                               },
                               child: ThemeWidget(

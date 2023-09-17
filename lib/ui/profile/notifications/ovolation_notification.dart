@@ -1,10 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:period_tracker/models/profile/notification/notification.dart';
 import 'package:period_tracker/providers/app_data_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../providers/user_data_provider.dart';
+import '../../../routes/session_manager.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/public_methods.dart';
 import '../../../widgets/custom_text_field.dart';
+import 'notifications_screen.dart';
 class NotificationOvulationScreen extends StatefulWidget {
   const NotificationOvulationScreen({Key? key}) : super(key: key);
 
@@ -15,9 +23,10 @@ class NotificationOvulationScreen extends StatefulWidget {
 
 class _NotificationOvulationScreenState extends State<NotificationOvulationScreen> {
   String reminderDays = '1 day before';
-  TimeOfDay? reminderTime;
+  String? reminderTime;
   bool metricSystem = false;
   bool isOvulationOn=false;
+  String? ovulationData;
   final reminderTextController=TextEditingController();
   String _startTime = DateFormat("hh:mm a").format(DateTime.now()).toString();
   String? time;
@@ -28,15 +37,53 @@ class _NotificationOvulationScreenState extends State<NotificationOvulationScree
   void initState() {
     // TODO: implement initState
     super.initState();
-    final provider=Provider.of<AppDataProvider>(context, listen: false);
-    DateTime currentTime = DateTime.now();
-    String formattedTime = DateFormat('h:mm a').format(currentTime);
-    provider.time=formattedTime;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp)async{
+      final provider=Provider.of<AppDataProvider>(context, listen: false);
+      DateTime currentTime = DateTime.now();
+      String formattedTime = DateFormat('h:mm a').format(currentTime);
+      provider.time=formattedTime;
+      getOvulationNotification();
+    });
   }
 
+  Future<void> getOvulationNotification() async {
+    final provider = Provider.of<UserDataProvider>(context, listen: false);
+    final appDataProvider = Provider.of<AppDataProvider>(context, listen: false);
+    SessionManager _sessionManager=SessionManager();
+    bool? data =await  _sessionManager.checkData("OvulationNotification");
+    if(data==true){
+      print("lateNoti$data");
+      setState(() {
+        isOvulationOn=true;
+        metricSystem=true;
+      });
+      ovulationData=await  _sessionManager.getDataFromSP("OvulationNotification");
+      if (ovulationData != null) {
+        Map<String, dynamic> cyclesData = jsonDecode(ovulationData!);
+        print("cycles$cyclesData");
+        OvulationNotification periods = OvulationNotification.fromJson(cyclesData);
+        print("cycles$periods");
+        provider.ovulationNotification=periods;
+        setState(() {
+          metricSystem=true;
+          reminderDays=provider.ovulationNotification.reminderDays??"";
+          reminderTime=provider.ovulationNotification.reminderTime;
+          reminderTextController.text=provider.ovulationNotification.reminderTextController??"";
+        });
+      }else{
+        DateTime currentTime = DateTime.now();
+        String formattedTime = DateFormat('h:mm a').format(currentTime);
+        reminderTime=formattedTime;
+        isOvulationOn=false;
+        reminderDays = '1 day before';
+        reminderTextController.clear();
+        metricSystem=false;
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
-
+    final userDataProvider=Provider.of<UserDataProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -55,6 +102,49 @@ class _NotificationOvulationScreenState extends State<NotificationOvulationScree
             Navigator.pop(context);
           },
         ),
+        actions: [
+          isOvulationOn?
+          Consumer<AppDataProvider>(
+            builder: (context, appDataProvider, child){
+              return Consumer<UserDataProvider>(
+                builder: (context, userDatProvider, child){
+                  return GestureDetector(
+                    onTap: () {
+                      if(reminderTextController.text.isEmpty||appDataProvider.time==null||reminderDays.isEmpty){
+                        toastMessage("Please enter data");
+                      }else{
+                        print("$reminderDays/RT${appDataProvider.time}/RTEXT${reminderTextController.text}");
+                        SessionManager _sessionManager=SessionManager();
+                        _sessionManager.storeData(
+                            "OvulationNotification",
+                            OvulationNotification(
+                                hasData: true,
+                                reminderDays: reminderDays,
+                                reminderTime: appDataProvider.time,
+                                reminderTextController: reminderTextController.text
+                            )
+                        );
+                        userDatProvider.notOvolution=true;
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20, right: 15),
+                      child: Text(
+                        "Save",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ):
+          const SizedBox()
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -75,11 +165,20 @@ class _NotificationOvulationScreenState extends State<NotificationOvulationScree
                 ),
                 Switch(
                   value: metricSystem,
-                  onChanged: (bool value) {
+                  onChanged: (bool value)async {
                     setState(() {
                       metricSystem = !metricSystem;
                       isOvulationOn=value;
                     });
+                    if(value==false){
+                      userDataProvider.notOvolution=value;
+                      print("notOvolution${userDataProvider.notOvolution}/$value");
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      prefs.remove("OvulationNotification");
+                      setState(() {
+                        reminderTextController.clear();
+                      });
+                    }
                   },
                   activeColor: accentColor,
                 ),
@@ -161,7 +260,7 @@ class _NotificationOvulationScreenState extends State<NotificationOvulationScree
                                   ),
                                   readOnly: true,
                                   onTap: () {
-                                    appDataProvider.selectTime(context);
+                                    appDataProvider.selectTime(context, "");
                                   },
                                   controller: TextEditingController(
                                     text: appDataProvider.time != null
