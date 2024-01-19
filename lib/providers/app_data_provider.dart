@@ -16,9 +16,28 @@ class AppDataProvider with ChangeNotifier {
 
   String? _time;
 
+  bool? _currentTheme;
+
+  bool? get currentTheme => _currentTheme;
+
+  set currentTheme(bool? value) {
+    _currentTheme = value;
+    print("currentTheme$_currentTheme");
+    notifyListeners();
+  }
+
   List<UserData> get userDataList => _userDataList;
 
   DateTime? _startDate;
+
+  String? _vRReminderTime;
+
+  String? get vRReminderTime => _vRReminderTime;
+
+  set vRReminderTime(String? value) {
+    _vRReminderTime = value;
+    notifyListeners();
+  }
 
   String? get time => _time;
 
@@ -66,7 +85,7 @@ class AppDataProvider with ChangeNotifier {
   // //   prefs.setStringList('user_data_list', userDataStrings);
   // // }
 
-  Future selectTime(context) async {
+  Future selectTime(context, String type) async {
     var pickedTime = await showTimePicker(
       context: context,
       builder: (BuildContext context, Widget? child) {
@@ -78,7 +97,7 @@ class AppDataProvider with ChangeNotifier {
     );
     String? formatTime = pickedTime?.format(context);
     if (pickedTime != null) {
-      time = formatTime!;
+      type=="vRRingReminderTime"?vRReminderTime=formatTime:time = formatTime!;
     }
   }
 
@@ -91,14 +110,14 @@ class AppDataProvider with ChangeNotifier {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: initialDate == null ? DateTime.now() : initialDate,
-      firstDate: type == "full" ? DateTime(1900) : DateTime.now(),
-      lastDate: type == "full" ? DateTime.now() : DateTime(2090),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: fontColor,
-            hintColor: fontColor,
-            colorScheme: const ColorScheme.light(primary: fontColor),
+            primaryColor: accentColor,
+            hintColor: accentColor,
+            colorScheme: const ColorScheme.light(primary: accentColor),
             buttonTheme: const ButtonThemeData(
               textTheme: ButtonTextTheme.primary,
             ),
@@ -113,35 +132,53 @@ class AppDataProvider with ChangeNotifier {
     }
   }
 
-  bool _isDarkMode = false;
   bool _check=false;
-
-
   bool get check => _check;
+
 
   set check(bool value) {
     _check = value;
     notifyListeners();
   }
 
+  bool _isDarkMode = false;
+  bool? _checkDarkTheme;
+
+
+  bool? get checkDarkTheme => _checkDarkTheme;
+
+  set checkDarkTheme(bool? value) {
+    _checkDarkTheme = value;
+    notifyListeners();
+  }
+
   bool get isDarkMode => _isDarkMode;
+
+  set isDarkMode(bool value) {
+    _isDarkMode = value;
+    notifyListeners();
+  }
 
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
+    print("isDarkMode$_isDarkMode");
+    saveThemePreference(_isDarkMode);
     notifyListeners();
-    saveThemePreference();
+    // currentTheme=!_isDarkMode;//This line is working fine just change real time theme
   }
-  Future<void> loadTheme() async {
+  Future<bool> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    check= prefs.getBool('isLightMode') ?? false;
-    _isDarkMode =!check;
-        print("load$_isDarkMode");
+    final loadedIsDarkMode = prefs.getBool('isDarkMode') ?? true;
+    print("loadedIsDarkMode$loadedIsDarkMode");
+    _isDarkMode = loadedIsDarkMode;
     notifyListeners();
+    return _isDarkMode;
   }
 
-  Future<void> saveThemePreference() async {
+  void saveThemePreference(bool isDarkMode) async {
     final prefs = await SharedPreferences.getInstance();
-    print("save$_isDarkMode");
-    await prefs.setBool('isLightMode', _isDarkMode);
+    print("saveMode$isDarkMode");
+    await prefs.setBool('isDarkMode', isDarkMode);
+    notifyListeners();
   }
 }

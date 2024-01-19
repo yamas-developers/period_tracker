@@ -1,9 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:period_tracker/models/profile/notification/notification.dart';
 import 'package:period_tracker/providers/app_data_provider.dart';
+import 'package:period_tracker/ui/profile/notifications/notifications_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../providers/user_data_provider.dart';
+import '../../../routes/session_manager.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/public_methods.dart';
 import '../../../widgets/custom_text_field.dart';
 
 class NotificationPeriodScreen extends StatefulWidget {
@@ -16,7 +24,7 @@ class NotificationPeriodScreen extends StatefulWidget {
 
 class _NotificationPeriodScreenState extends State<NotificationPeriodScreen> {
   String reminderDays = '1 day before';
-  TimeOfDay? reminderTime;
+  String? reminderTime;
   bool metricSystem = false;
   bool isPeriodOn=false;
   final reminderTextController=TextEditingController();
@@ -29,15 +37,46 @@ class _NotificationPeriodScreenState extends State<NotificationPeriodScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    final provider=Provider.of<AppDataProvider>(context, listen: false);
-    DateTime currentTime = DateTime.now();
-    String formattedTime = DateFormat('h:mm a').format(currentTime);
-    provider.time=formattedTime;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
+      final provider=Provider.of<AppDataProvider>(context, listen: false);
+      DateTime currentTime = DateTime.now();
+      String formattedTime = DateFormat('h:mm a').format(currentTime);
+      provider.time=formattedTime;
+      getPeriodNotification();
+      setState(() {
+      });
+    });
   }
-
+  Future<void> getPeriodNotification() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    SessionManager _sessionManager=SessionManager();
+    final provider = Provider.of<UserDataProvider>(context, listen: false);
+    String? cyclesJson =await  _sessionManager.getDataFromSP("PeriodNotification");
+    if (cyclesJson != null) {
+      Map<String, dynamic> cyclesData = jsonDecode(cyclesJson);
+      print("cycles$cyclesData");
+      PeriodNotification periods = PeriodNotification.fromJson(cyclesData);
+      print("cycles$periods");
+      provider.notificationPeriod=periods;
+      if(provider.notificationPeriod.hasData==true){
+        setState(() {
+          isPeriodOn=true;
+          metricSystem=true;
+          reminderDays=provider.notificationPeriod.reminderDays??"";
+          reminderTime=provider.notificationPeriod.reminderTime;
+          reminderTextController.text=provider.notificationPeriod.reminderTextController??"";
+        });
+      }else{
+        reminderDays='1 day before';
+        DateTime currentTime = DateTime.now();
+        String formattedTime = DateFormat('h:mm a').format(currentTime);
+        reminderTime=formattedTime;
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
-
+    final userDataProvider=Provider.of<UserDataProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -56,6 +95,49 @@ class _NotificationPeriodScreenState extends State<NotificationPeriodScreen> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          isPeriodOn?
+          Consumer<AppDataProvider>(
+            builder: (context, appDataProvider, child){
+              return Consumer<UserDataProvider>(
+                builder: (context, userDataProvider, child){
+                  return GestureDetector(
+                    onTap: () {
+                      if(reminderTextController.text.isEmpty||appDataProvider.time==null||reminderDays.isEmpty){
+                        toastMessage("Please enter data");
+                      }else{
+                        print("$reminderDays/RT${appDataProvider.time}/RTEXT${reminderTextController.text}");
+                        SessionManager _sessionManager=SessionManager();
+                        _sessionManager.storeData(
+                            "PeriodNotification",
+                            PeriodNotification(
+                                hasData: true,
+                                reminderDays: reminderDays,
+                                reminderTime: appDataProvider.time,
+                                reminderTextController: reminderTextController.text
+                            )
+                        );
+                        userDataProvider.notPeriod=true;
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20, right: 15),
+                      child: Text(
+                        "Save",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ):
+          const SizedBox()
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -76,11 +158,19 @@ class _NotificationPeriodScreenState extends State<NotificationPeriodScreen> {
                 ),
                 Switch(
                   value: metricSystem,
-                  onChanged: (bool value) {
+                  onChanged: (bool value) async{
                     setState(() {
                       metricSystem = !metricSystem;
                       isPeriodOn=value;
                     });
+                    if(value==false){
+                      userDataProvider.notPeriod=value;
+                      print(value);
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      prefs.remove("PeriodNotification");
+                      setState(() {
+                      });
+                    }
                   },
                   activeColor: accentColor,
                 ),
@@ -162,7 +252,7 @@ class _NotificationPeriodScreenState extends State<NotificationPeriodScreen> {
                                   ),
                                   readOnly: true,
                                   onTap: () {
-                                    appDataProvider.selectTime(context);
+                                    appDataProvider.selectTime(context, "");
                                   },
                                   controller: TextEditingController(
                                     text: appDataProvider.time != null

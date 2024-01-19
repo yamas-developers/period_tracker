@@ -109,7 +109,7 @@ class _LastPeriodScreenState extends State<LastPeriodScreen> {
                       return;
                     }
                     SessionManager sessionManager=SessionManager();
-                    sessionManager.lastPeriodDate(selectedDate.toString());
+                    sessionManager.storeString("date", selectedDate.toString());
                     Navigator.push(
                         context,
                         MaterialPageRoute(

@@ -11,8 +11,14 @@ import '../widgets/custom_app_button.dart';
 import 'bithdate.dart';
 import 'components/numberPicker.dart';
 
-class MensaturationDays extends StatelessWidget {
+class MensaturationDays extends StatefulWidget {
+  @override
+  State<MensaturationDays> createState() => _MensaturationDaysState();
+}
+
+class _MensaturationDaysState extends State<MensaturationDays> {
   int menstruationDays=1;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,11 +87,8 @@ class MensaturationDays extends StatelessWidget {
           ),
           CustomAppButton(
             onTap: () {
-              // if (menstruationDays) {
-              //   return;
-              // }
               SessionManager sessionManager=SessionManager();
-              sessionManager.menstruationAverage(menstruationDays.toString());
+              sessionManager.storeString("menstruationAverage", menstruationDays.toString());
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => DateOfBith()));
             },

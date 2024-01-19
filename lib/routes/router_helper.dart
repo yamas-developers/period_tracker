@@ -12,7 +12,7 @@ import '../ui/intro/intro_story.dart';
 import '../ui/profile/notifications/contraception_notification.dart';
 import '../ui/profile/notifications/end_of_periods_notification.dart';
 import '../ui/profile/notifications/late_notification.dart';
-import '../ui/profile/notifications/notifications.dart';
+import '../ui/profile/notifications/notifications_screen.dart';
 import '../ui/profile/notifications/ovolation_notification.dart';
 import '../ui/profile/notifications/period_notification.dart';
 import '../ui/profile/use_access_code.dart';

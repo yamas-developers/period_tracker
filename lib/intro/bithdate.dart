@@ -11,8 +11,23 @@ import '../widgets/custom_app_button.dart';
 import 'mensaturation_periods.dart';
 import 'components/numberPicker.dart';
 
-class DateOfBith extends StatelessWidget {
+class DateOfBith extends StatefulWidget {
+  @override
+  State<DateOfBith> createState() => _DateOfBithState();
+}
+
+class _DateOfBithState extends State<DateOfBith> {
   int? dob;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp)async{
+      dob=2003;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +78,7 @@ class DateOfBith extends StatelessWidget {
           CustomAppButton(
             onTap: () {
               SessionManager sessionManager=SessionManager();
-              sessionManager.dateOfBirth(dob.toString());
+              sessionManager.storeString("dob", dob.toString());
               Navigator.push(
                   context,
                   MaterialPageRoute(

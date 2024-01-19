@@ -88,7 +88,7 @@ class CyclingAverageDay extends StatelessWidget {
           CustomAppButton(
             onTap: () {
               SessionManager sessionManager=SessionManager();
-              sessionManager.cyclingAverageDays(cyclingAverageDay.toString());
+              sessionManager.storeString("cyclingAverageDays", cyclingAverageDay.toString());
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => MensaturationDays()));
             },
