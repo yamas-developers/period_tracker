@@ -14,6 +14,7 @@ class UserData {
     required this.remainderDays,
     required this.remainderTime,
   });
+
   Map<String, dynamic> toJson() {
     return {
       'selectedDate': selectedDate,
